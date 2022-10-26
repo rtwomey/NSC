@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from xml.etree import ElementTree as ET
+# from xml.etree import ElementTree as ET
+import json
 import copy
 import random
 import alp.core as core
@@ -55,31 +56,32 @@ class Item(object):
         return data
 
 def feedback(items):
-    feedback = ET.Element("items")
-    
+    feedback_items = []
+
     def processItem(item):
-        itemToAdd = ET.SubElement(feedback, "item")
+        itemToAdd_dict = {}
 
         data = item.get()
 
-        for (k, v) in data["attrib"].iteritems():
+        for (k, v) in data["attrib"].items():
             if v is None:
                 continue
-            itemToAdd.set(k, v)
+            itemToAdd_dict[k] = v
 
-        for (k, v) in data["content"].iteritems():
+        for (k, v) in data["content"].items():
             if v is None:
                 continue
             if k != "fileIcon" and k != "fileType":
-                child = ET.SubElement(itemToAdd, k)
-                child.text = v
+                itemToAdd_dict[k] = v
             if k == "icon":
                 if "fileIcon" in data["content"].keys():
                     if data["content"]["fileIcon"] == True:
-                        child.set("type", "fileicon")
+                        itemToAdd_dict[k] = v
                 if "fileType" in data["content"].keys():
                     if data["content"]["fileType"] == True:
-                        child.set("type", "filetype")
+                        itemToAdd_dict[k] = v
+
+        feedback_items.append(itemToAdd_dict)
 
     if isinstance(items, list):
         for anItem in items:
@@ -87,4 +89,4 @@ def feedback(items):
     else:
         processItem(items)
 
-    print ET.tostring(feedback, encoding="utf-8")
+    print(json.dumps({'items': feedback_items}))
