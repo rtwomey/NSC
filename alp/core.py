@@ -21,11 +21,12 @@ def bundle():
 
     infoPath = os.path.abspath("./info.plist")
     if os.path.exists(infoPath):
-        info = plistlib.readPlist(infoPath)
-        try:
-            gBundleID = info["bundleid"]
-        except KeyError:
-            raise Exception("Bundle ID not defined or readable from info.plist.")
+        with open(infoPath, 'rb') as f:
+            info = plistlib.load(f)
+            try:
+                gBundleID = info["bundleid"]
+            except KeyError:
+                raise Exception("Bundle ID not defined or readable from info.plist.")
     else:
         raise Exception("info.plist missing.")
 
